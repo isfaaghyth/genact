@@ -1,7 +1,7 @@
 [package]
 name = "genact"
 description = "A nonsense activity generator"
-version = "0.2.3"
+version = "0.6.0"
 repository = "https://github.com/svenstaro/genact"
 authors = ["Sven-Hendrik Haase <svenstaro@gmail.com>"]
 license = "MIT"
@@ -15,15 +15,19 @@ maintenance = { status = "actively-developed" }
 
 [dependencies]
 pbr = "1.0"
-yansi = "0.3"
-rand = "0.4"
+yansi = "0.4"
+rand = "0.5"
 chrono = "0.4"
 url = "1.6"
 lazy_static = "1.0"
+humantime = "1.1"
+regex = "1.0"
+fake = "1.2.2"
 
 [target.'cfg(not(target_os = "emscripten"))'.dependencies]
 clap = "2.29"
+ctrlc = "3.1"
 
 [target.'cfg(target_os = "emscripten")'.dependencies]
 emscripten-sys = "0.3"
-stdweb = "0.3"
+stdweb = "0.4"

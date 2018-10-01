@@ -1,15 +1,15 @@
 /// Module that pretends to mine a cryptocurrency.
-
 use rand::{thread_rng, Rng};
-use rand::distributions::{Normal, IndependentSample};
+use rand::distributions::{Normal, Distribution};
 use std::time::Instant;
 use yansi::Paint;
 use chrono::prelude::*;
 use chrono::Duration;
 
-use utils::{rand_hex_string, csleep};
+use utils::{gen_hex_string, csleep};
+use parse_args::AppConfig;
 
-pub fn run() {
+pub fn run(appconfig: &AppConfig) {
     let mut rng = thread_rng();
     let num_lines = rng.gen_range(300, 1000);
 
@@ -44,9 +44,9 @@ pub fn run() {
                      time=time,
                      separator=Paint::black("|"),
                      source=Paint::blue("stratum"),
-                     jobhex=rand_hex_string(&mut rng, 8),
-                     seedhex=rand_hex_string(&mut rng, 32),
-                     targethex=rand_hex_string(&mut rng, 24));
+                     jobhex=gen_hex_string(&mut rng, 8),
+                     seedhex=gen_hex_string(&mut rng, 32),
+                     targethex=gen_hex_string(&mut rng, 24));
         } else if remaining_until_next_solution == 0 {
             remaining_until_next_solution = solution_found_every_n_lines;
             num_solutions_found += 1;
@@ -62,7 +62,7 @@ pub fn run() {
                      time=time,
                      separator=Paint::black("|"),
                      source=Paint::blue("CUDA0"),
-                     noncehex=rand_hex_string(&mut rng, 16));
+                     noncehex=gen_hex_string(&mut rng, 16));
             println!("{info:>3}  {time}{separator}{source:<13}{accepted}",
                      info=info,
                      time=time,
@@ -78,7 +78,7 @@ pub fn run() {
             let mut total_mhs = 0.0;
             let mut gpus = String::from("");
             for gpu in 0..num_gpus {
-                let actual_mhs_per_gpu = approximate_mhs_per_gpu + normal.ind_sample(&mut rng);
+                let actual_mhs_per_gpu = approximate_mhs_per_gpu + normal.sample(&mut rng);
                 gpus.push_str(&format!("gpu/{gpu} {mhs:.2} ", gpu=gpu, mhs=Paint::cyan(actual_mhs_per_gpu)));
                 total_mhs += actual_mhs_per_gpu;
             }
@@ -95,7 +95,11 @@ pub fn run() {
                      solutions=num_solutions_found,
                      elapsed=elapsed);
 
-            csleep(sleep_length);
+        }
+        csleep(sleep_length);
+
+        if appconfig.should_exit() {
+            return
         }
     }
 }
